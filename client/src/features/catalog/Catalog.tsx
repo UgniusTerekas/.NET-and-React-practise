@@ -1,6 +1,6 @@
-import { FormGroup, Grid, Pagination, Paper, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { FormGroup, Grid, Paper } from "@mui/material";
 import { useEffect } from "react";
+import AppPagination from "../../app/components/AppPagination";
 import CheckBoxButtons from "../../app/components/CheckBoxButtons";
 import RadioButtonGroup from "../../app/components/RadioButtonGroup";
 import LoadingComponent from "../../app/layout/LoadingComponent";
@@ -9,6 +9,7 @@ import {
   fetchFilters,
   fetchProductsAsync,
   productSelectors,
+  setPageNumber,
   setProductParams,
 } from "./catalogSlice";
 import ProductList from "./ProductList";
@@ -41,11 +42,10 @@ export default function Catalog() {
     if (!filtersLoaded) dispatch(fetchFilters());
   }, [filtersLoaded, dispatch]);
 
-  if (status.includes("pendingFetchProducts"))
-    return <LoadingComponent message="Loading products..." />;
+  if (!filtersLoaded) return <LoadingComponent message="Loading products..." />;
 
   return (
-    <Grid container spacing={4}>
+    <Grid container columnSpacing={4}>
       <Grid item xs={3}>
         <Paper sx={{ mb: 2 }}>
           <ProductSearch />
@@ -84,16 +84,15 @@ export default function Catalog() {
         <ProductList products={products} />
       </Grid>
       <Grid item xs={3} />
-      <Grid item xs={9}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography>Displaying 1-6 of 20 items</Typography>
-          <Pagination
-            color="secondary"
-            size="large"
-            count={metaData?.totalPages}
-            page={metaData?.currentPage}
+      <Grid item xs={9} sx={{ mb: 2 }}>
+        {metaData && (
+          <AppPagination
+            metaData={metaData}
+            onPageChange={(page: number) =>
+              dispatch(setPageNumber({ pageNumber: page }))
+            }
           />
-        </Box>
+        )}
       </Grid>
     </Grid>
   );

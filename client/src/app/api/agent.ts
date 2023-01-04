@@ -1,5 +1,5 @@
 import { PaginatedResponse } from "./../models/pagination";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
 axios.defaults.baseURL = "http://localhost:5041/api/";
 axios.defaults.withCredentials = true;
@@ -15,10 +15,8 @@ axios.interceptors.response.use(async (response) => {
       response.data,
       JSON.parse(pagination)
     );
-    console.log(response);
     return response;
   }
-  console.log(response);
   return response;
 });
 
