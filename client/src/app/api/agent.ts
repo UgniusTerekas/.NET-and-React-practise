@@ -1,11 +1,18 @@
 import { PaginatedResponse } from "./../models/pagination";
 import axios, { AxiosResponse } from "axios";
+import { store } from "../store/configureStore";
 
 axios.defaults.baseURL = "http://localhost:5041/api/";
 axios.defaults.withCredentials = true;
 
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 1000));
 const responseBody = (response: AxiosResponse) => response.data;
+
+axios.interceptors.request.use((config) => {
+  const token = store.getState().account.user?.token;
+  if (token) config.headers!.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 axios.interceptors.response.use(async (response) => {
   await sleep();
@@ -42,9 +49,16 @@ const Basket = {
     requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
 };
 
+const Account = {
+  login: (values: any) => requests.post("/account/login", values),
+  register: (values: any) => requests.post("/account/register", values),
+  currentUser: () => requests.get("/account/currentUser"),
+};
+
 const agent = {
   Catalog,
   Basket,
+  Account,
 };
 
 export default agent;
